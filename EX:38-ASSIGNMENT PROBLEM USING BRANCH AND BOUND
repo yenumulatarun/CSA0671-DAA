@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define N 4
+#define M 4
+#define INF INT_MAX
+
+int cost[N][M];
+int assigned[N];
+int min_cost;
+
+void printSolution(int cost[N][M]) {
+  printf("The following matrix shows the assigned jobs:\n");
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < M; j++) {
+      if (assigned[i] == j)
+        printf("%d\t", cost[i][j]);
+      else
+        printf("0\t");
+    }
+    printf("\n");
+  }
+}
+
+int bound(int cost[N][M], int row, int assigned[N], int var[N]) {
+  int result = min_cost;
+  for (int i = row; i < N; i++) {
+    int j;
+    int min = INF;
+    for (int k = 0; k < M; k++) {
+      if (var[k] == 0 && cost[i][k] < min) {
+        min = cost[i][k];
+        j = k;
+      }
+    }
+    var[j] = 1;
+    if (i == N - 1) {
+      for (int k = 0; k < N; k++) {
+        assigned[k] = var[k];
+      }
+      min_cost = result + min;
+      return 1;
+    }
+    if (result + min + cost[i + 1][0] < min_cost) {
+      int *new_var = (int *)malloc(M * sizeof(int));
+      for (int k = 0; k < M; k++) {
+        new_var[k] = var[k];
+      }
+      if (bound(cost, i + 1, assigned, new_var)) return 1;
+    }
+    var[j] = 0;
+  }
+  return 0;
+}
+
+void assignment(int cost[N][M]) {
+  int *var = (int *)malloc(M * sizeof(int));
+  for (int i = 0; i < M; i++) var[i] = 0;
+  min_cost = INF;
+  if (bound(cost, 0, assigned, var)) printSolution(cost);
+}
+
+int main() {
+  int cost[N][M] = {{9, 2, 7, 8}, {6, 4, 3, 7}, {5, 8, 1, 8}, {7, 6, 9, 4}};
+  assignment(cost);
+  return 0;
+}
