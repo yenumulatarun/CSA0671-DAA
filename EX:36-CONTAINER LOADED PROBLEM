@@ -1,0 +1,35 @@
+#include <stdio.h>
+
+#define MAX_CONTAINERS 100
+#define MAX_WEIGHT 50
+
+int n, weight[MAX_CONTAINERS];
+
+int can_load(int container, int w)
+{
+    if (container == n)
+        return 1;
+    if (w + weight[container] <= MAX_WEIGHT)
+        if (can_load(container + 1, w + weight[container]))
+            return 1;
+    if (can_load(container + 1, w))
+        return 1;
+    return 0;
+}
+
+int main()
+{
+    printf("Enter the number of containers: ");
+    scanf("%d", &n);
+
+    printf("Enter the weights of the containers: ");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &weight[i]);
+
+    if (can_load(0, 0))
+        printf("All containers can be loaded onto the ship.\n");
+    else
+        printf("Not all containers can be loaded onto the ship.\n");
+
+    return 0;
+}
